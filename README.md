@@ -9,10 +9,6 @@
   Integrate an AI game companion with voice, memory, and in-game agency — in just a few steps.
 </p>
 
-<p align="center">
-  Built for <strong>Global AI Game Hack 2026</strong>
-</p>
-
 ---
 
 ### Submission Video
@@ -99,7 +95,7 @@ Under the hood, Dory is a **six-service system** with a web frontend, persona cr
 | **Docker** | For local MongoDB (memory system) |
 | **Minecraft Java Edition** | Server running locally or remotely (1.20+) |
 | **LiveKit Cloud** | Free account at [livekit.io](https://livekit.io) |
-| **API Keys** | LLM provider, Deepgram (STT), ElevenLabs (TTS) |
+| **API Keys** | Google Gemini (LLM), Deepgram (STT), ElevenLabs (TTS) |
 
 ---
 
@@ -137,17 +133,17 @@ MINECRAFT_HOST=localhost
 MINECRAFT_PORT=25565
 MINECRAFT_AUTH_MODE=offline
 
-# LLM — pick one provider: mistral, openai, or anthropic
-LLM_PROVIDER=openai
-OPENAI_API_KEY=sk-...
+# LLM — Gemini 3
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=...
 
 # MongoDB (memory system)
 MONGODB_URI=mongodb://localhost:27017/dory
 
 # AI Structure Builder (optional but recommended)
 # Uses a separate, more capable model for generating build code
-BUILDER_LLM_PROVIDER=openai
-BUILDER_LLM_MODEL=gpt-4o
+BUILDER_LLM_PROVIDER=gemini
+BUILDER_LLM_MODEL=gemini-3
 ```
 
 #### Voice Agent (`services/voice-agent/.env`)
@@ -166,21 +162,15 @@ DEEPGRAM_API_KEY=...
 # ElevenLabs TTS
 ELEVEN_API_KEY=...
 
-# LLM for voice conversation (must support OpenAI-compatible function calling)
-LLM_API_KEY=sk-...
-LLM_MODEL=gpt-4o-mini
+# LLM for voice conversation
+LLM_API_KEY=...
+LLM_MODEL=gemini-3
 
 # Game Agent URL (A2A connection)
 GAME_AGENT_URL=http://localhost:3000
 ```
 
-> **Tip — Budget-friendly voice LLM:** You can use Groq with Qwen for the voice agent's LLM at no cost:
-> ```bash
-> LLM_API_KEY=gsk_...
-> LLM_BASE_URL=https://api.groq.com/openai/v1
-> LLM_MODEL=qwen/qwen3-32b
-> ```
-> Avoid llama models on Groq — they don't call tools reliably.
+> **Note:** We use Google Gemini 3 as the primary LLM across all agents for reasoning, voice conversation, and structure generation.
 
 #### Gatekeeper Agent (`services/gatekeeper-agent/.env`)
 
@@ -190,8 +180,8 @@ PORT=4002
 # Persona Builder Service URL
 PERSONA_BUILDER_URL=http://localhost:4003
 
-# Groq API Key (required for LLM)
-GROQ_API_KEY=gsk_...
+# Gemini API Key (required for LLM)
+GEMINI_API_KEY=...
 ```
 
 #### Persona Builder Agent (`services/persona-builder-agent/.env`)
@@ -202,10 +192,8 @@ PORT=4003
 # MongoDB Connection
 MONGODB_URI=mongodb://localhost:27017/dory
 
-# LLM - OpenAI (or OpenRouter)
-OPENAI_API_KEY=sk-...
-# Optional: Set to 'https://openrouter.ai/api/v1' for OpenRouter
-# OPENAI_BASE_URL=https://openrouter.ai/api/v1
+# LLM - Gemini 3
+GEMINI_API_KEY=...
 
 # Image Generation - Gemini
 GEMINI_API_KEY=...
@@ -412,7 +400,7 @@ This architecture enables seamless handoffs between agents while maintaining con
 
 | Capability | Description |
 |------------|-------------|
-| Voice pipeline | Silero VAD → Deepgram Nova 3 STT → LLM → ElevenLabs TTS |
+| Voice pipeline | Silero VAD → Deepgram Nova 3 STT → Gemini 3 LLM → ElevenLabs TTS |
 | Real-time events | Critical game events (death, low health) interrupt Dory mid-sentence |
 | Event narration | High/medium events injected into LLM context before each turn |
 | Memory sync | Conversation history sent to game agent every 60s for preference extraction |
@@ -553,7 +541,7 @@ dory/
     │       ├── bot/            # Mineflayer bot wrapper + session manager
     │       ├── builder/        # AI structure generation (LLM → sandbox → placer)
     │       ├── events/         # Event bus, Minecraft listener, A2A forwarder
-    │       ├── llm/            # Multi-provider LLM client (OpenAI/Anthropic/Mistral)
+    │       ├── llm/            # LLM client (Gemini 3)
     │       ├── memory/         # MongoDB memory system (episodic/semantic/procedural)
     │       ├── planning/       # Multi-step plan engine
     │       └── tools/          # Tool registry (30+ tools) + executor
@@ -595,9 +583,7 @@ dory/
 | Monorepo | pnpm workspaces + Turborepo |
 | Runtime | Node.js 20+ / TypeScript |
 | Minecraft bot | mineflayer + pathfinder + collectblock + pvp |
-| LLM (game reasoning) | OpenAI / Anthropic / Mistral (switchable) |
-| LLM (voice) | Any OpenAI-compatible API (GPT-4o-mini, Groq, etc.) |
-| LLM (builder) | Configurable — recommended: GPT-4o or higher for spatial code generation |
+| LLM | Google Gemini 3 (primary for all agents — game reasoning, voice, builder, persona) |
 | Voice framework | LiveKit Agents SDK |
 | Speech-to-Text | Deepgram Nova 3 |
 | Text-to-Speech | ElevenLabs Flash v2.5 |
@@ -696,8 +682,7 @@ pnpm dev             # Then retry
 ### AI structure generation fails
 
 - Make sure the bot has operator permissions: run `/op <bot_username>` in the Minecraft server console
-- If using GPT-5 or o-series models, the provider automatically uses `max_completion_tokens` instead of `max_tokens`
-- Check that `OPENAI_API_KEY` is set (required even if your main LLM provider is Mistral/Anthropic, if you use OpenAI for the builder)
+- Ensure `GEMINI_API_KEY` is properly set in the game agent `.env`
 
 ### MongoDB / memory not working
 
@@ -719,7 +704,7 @@ pnpm dev             # Then retry
 Dory's architecture is designed to be modular and extensible:
 
 - **Add new tools** — Define a tool in `tools/registry.ts`, implement it in `tools/executor.ts`. The LLM discovers tools automatically via function calling.
-- **Swap LLM providers** — Change `LLM_PROVIDER` in `.env`. OpenAI, Anthropic, and Mistral work out of the box. Add new providers by implementing the `LLMProvider` interface.
+- **Swap LLM providers** — Change `LLM_PROVIDER` in `.env`. Gemini 3 is the default. Add new providers by implementing the `LLMProvider` interface.
 - **Change the voice** — Swap `TTS_VOICE_ID` in the voice agent config, or replace ElevenLabs with another TTS provider.
 - **Replace the game** — The A2A protocol is game-agnostic. Replace the mineflayer bot with any game's API and the voice agent still works.
 - **Add memory types** — Extend the memory system with new document types in `memory/types.ts`.
@@ -734,4 +719,4 @@ MIT
 
 ---
 
-Built for **Global AI Game Hack 2026**
+Built with ❤️ by the Dory team.
