@@ -24,9 +24,6 @@ services:
   # ── Game Agent (mineflayer bot + LLM) ─────────────────────────────
   game-agent:
     image: dory-monorepo
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: dory-game-agent
     working_dir: /app/services/game-agent
     command: ["node", "dist/index.js"]
