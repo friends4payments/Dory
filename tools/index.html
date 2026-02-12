@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dory AI - Dev Tools</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container { max-width: 600px; width: 100%; padding: 2rem; }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: #22d3ee; }
+    p.subtitle { color: #94a3b8; margin-bottom: 2rem; }
+    .card {
+      display: block;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .card:hover { border-color: #22d3ee; transform: translateY(-2px); }
+    .card h2 { font-size: 1.1rem; color: #f1f5f9; margin-bottom: 0.35rem; }
+    .card p { font-size: 0.875rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dory AI Dev Tools</h1>
+    <p class="subtitle">Debug dashboards for the Dory AI gaming companion</p>
+
+    <a class="card" href="/tools/test-memory.html">
+      <h2>Memory Dashboard</h2>
+      <p>Browse and inspect the game agent's episodic, semantic, and procedural memory stores.</p>
+    </a>
+
+    <a class="card" href="/tools/test-console.html">
+      <h2>Game Console</h2>
+      <p>Connect a bot, send commands, and monitor real-time game events via WebSocket.</p>
+    </a>
+
+    <a class="card" href="/tools/test-voice.html">
+      <h2>Voice Test</h2>
+      <p>Test the LiveKit voice agent session — microphone, STT, TTS, and tool calls.</p>
+    </a>
+  </div>
+</body>
+</html>

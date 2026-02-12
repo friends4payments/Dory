@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dory Game Agent - Test Console</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #00ff00;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .status {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            border-left: 4px solid #00ff00;
+        }
+
+        .status.disconnected {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .console-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a0a;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .output {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .output-line {
+            margin-bottom: 8px;
+        }
+
+        .output-line.info {
+            color: #00aaff;
+        }
+
+        .output-line.success {
+            color: #00ff00;
+        }
+
+        .output-line.error {
+            color: #ff0000;
+        }
+
+        .output-line.command {
+            color: #ffaa00;
+        }
+
+        .output-line.result {
+            color: #00ffaa;
+        }
+
+        .input-container {
+            display: flex;
+            border-top: 1px solid #00ff00;
+            padding: 10px;
+            background: #1a1a1a;
+        }
+
+        .prompt {
+            color: #00ff00;
+            margin-right: 10px;
+        }
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .quick-commands {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .quick-command {
+            padding: 8px 12px;
+            background: #2a2a2a;
+            border: 1px solid #00ff00;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .quick-command:hover {
+            background: #00ff00;
+            color: #1a1a1a;
+        }
+
+        code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Dory Game Agent - Test Console</h1>
+    
+    <div class="status" id="status">
+        <strong>Status:</strong> <span id="statusText">Connecting...</span>
+    </div>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <label style="color: #00ccff; font-weight: bold; min-width: 70px;">Bot Name:</label>
+        <input type="text" id="botNameInput" placeholder="DoryBot" value="DoryBot"
+               style="width: 120px; padding: 8px; background: #2a2a2a; border: 1px solid #00ccff; border-radius: 4px; color: #00ccff; font-family: inherit; font-size: 14px;">
+        <label style="color: #00ccff;">Host:</label>
+        <input type="text" id="hostInput" placeholder="localhost" value="localhost"
+               style="width: 110px; padding: 8px; background: #2a2a2a; border: 1px solid #00ccff; border-radius: 4px; color: #00ccff; font-family: inherit; font-size: 14px;">
+        <label style="color: #00ccff;">Port:</label>
+        <input type="text" id="portInput" placeholder="25565" value="25565"
+               style="width: 70px; padding: 8px; background: #2a2a2a; border: 1px solid #00ccff; border-radius: 4px; color: #00ccff; font-family: inherit; font-size: 14px;">
+        <button class="quick-command" onclick="createSession()" style="margin: 0; border-color: #00ccff; color: #00ccff; font-weight: bold;">Create Bot Session</button>
+    </div>
+
+    <div class="session-input" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        <label for="sessionId" style="color: #00ff00;">Session ID:</label>
+        <input type="text" id="sessionId" placeholder="Enter session ID or create a bot above..." 
+               style="flex: 1; padding: 8px; background: #2a2a2a; border: 1px solid #00ff00; border-radius: 4px; color: #00ff00; font-family: inherit; font-size: 14px;">
+        <button class="quick-command" onclick="testSession()" style="margin: 0;">Test Connection</button>
+        <button class="quick-command" onclick="loadSessions()" style="margin: 0;">Load Sessions</button>
+        <button class="quick-command" onclick="disconnectSession()" style="margin: 0; border-color: #ff4444; color: #ff4444;">Disconnect</button>
+    </div>
+
+    <div style="margin-bottom: 10px; display: flex; gap: 10px; align-items: center;">
+        <label style="color: #ffaa00; font-weight: bold;">Ask AI:</label>
+        <input type="text" id="askInput" placeholder='e.g. "follow me", "build a pillar here", "what do you see?"'
+               style="flex: 1; padding: 8px; background: #2a2a2a; border: 1px solid #ffaa00; border-radius: 4px; color: #ffaa00; font-family: inherit; font-size: 14px;">
+        <button class="quick-command" onclick="askAI()" style="margin: 0; border-color: #ffaa00; color: #ffaa00;">Send to AI</button>
+    </div>
+
+    <div class="quick-commands">
+        <button class="quick-command" onclick="sendCommand('help')">Help</button>
+        <button class="quick-command" onclick="quickCommand('inventory')">Inventory</button>
+        <button class="quick-command" onclick="quickCommand('position')">Position</button>
+        <button class="quick-command" onclick="quickCommand('looking')">Bot's View</button>
+        <button class="quick-command" onclick="quickCommand('playerlooking')">Player's View</button>
+        <button class="quick-command" onclick="quickCommand('scan {sid} 32')">Scan Area</button>
+        <button class="quick-command" onclick="quickCommand('follow')">Follow Me</button>
+        <button class="quick-command" onclick="quickCommand('stop')">Stop</button>
+    </div>
+
+    <div class="console-container">
+        <div class="output" id="output"></div>
+        <div class="input-container">
+            <span class="prompt">$</span>
+            <input type="text" id="commandInput" placeholder="Type command or 'help' for available commands..." autofocus>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        const output = document.getElementById('output');
+        const input = document.getElementById('commandInput');
+        const status = document.getElementById('status');
+        const statusText = document.getElementById('statusText');
+
+        function connect() {
+            ws = new WebSocket('ws://localhost/game/ws');
+
+            ws.onopen = () => {
+                status.classList.remove('disconnected');
+                statusText.textContent = 'Connected ✅';
+                addOutput('Connected to Dory Game Agent', 'success');
+            };
+
+            ws.onclose = () => {
+                status.classList.add('disconnected');
+                statusText.textContent = 'Disconnected ❌';
+                addOutput('Disconnected from server. Reconnecting...', 'error');
+                setTimeout(connect, 2000);
+            };
+
+            ws.onerror = (error) => {
+                addOutput('WebSocket error: ' + error, 'error');
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (e) {
+                    addOutput('Failed to parse message: ' + event.data, 'error');
+                }
+            };
+        }
+
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'info':
+                    addOutput(data.message, 'info');
+                    if (data.availableCommands) {
+                        addOutput('Available commands:', 'info');
+                        data.availableCommands.forEach(cmd => {
+                            addOutput('  • ' + cmd, 'info');
+                        });
+                    }
+                    break;
+
+                case 'success':
+                    addOutput('✓ ' + data.message, 'success');
+                    break;
+
+                case 'error':
+                    addOutput('✗ Error: ' + data.error, 'error');
+                    break;
+
+                case 'result':
+                    // Special formatting for AI responses
+                    if (data.command === 'ask' && data.data) {
+                        addOutput('🤖 Dory: ' + data.data.response, 'success');
+                        if (data.data.toolsExecuted && data.data.toolsExecuted.length > 0) {
+                            addOutput('  Tools used (' + data.data.toolsExecuted.length + '):', 'info');
+                            data.data.toolsExecuted.forEach(t => {
+                                addOutput('    → ' + t.name + '(' + JSON.stringify(t.args) + ') = ' + t.result, 'info');
+                            });
+                        }
+                        addOutput('  [LLM calls: ' + data.data.llmCalls + ']', 'info');
+                    } else {
+                        addOutput('Result (' + data.command + '):', 'result');
+                        addOutput(JSON.stringify(data.data, null, 2), 'result');
+                    }
+                    
+                    // Auto-fill session ID if we got sessions list
+                    if (data.command === 'sessions' && data.data.sessions && data.data.sessions.length > 0) {
+                        const firstSession = data.data.sessions[0];
+                        document.getElementById('sessionId').value = firstSession;
+                        addOutput('Auto-filled first session ID: ' + firstSession, 'info');
+                    }
+                    break;
+
+                case 'event':
+                    addOutput('Event [' + data.sessionId + ']: ' + JSON.stringify(data.event), 'info');
+                    break;
+
+                case 'help':
+                    addOutput('Available Commands:', 'info');
+                    Object.entries(data.commands).forEach(([cmd, desc]) => {
+                        addOutput(`  ${cmd} - ${desc}`, 'info');
+                    });
+                    break;
+
+                default:
+                    addOutput('Unknown message type: ' + data.type, 'info');
+            }
+        }
+
+        function addOutput(text, className = '') {
+            const line = document.createElement('div');
+            line.className = 'output-line ' + className;
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function getSessionId() {
+            return document.getElementById('sessionId').value.trim();
+        }
+
+        function quickCommand(cmd) {
+            const sessionId = getSessionId();
+            if (!sessionId) {
+                addOutput('⚠ Please enter a Session ID first!', 'error');
+                return;
+            }
+            // Replace {sid} placeholder with actual session ID
+            const fullCmd = cmd.replace(/{sid}/g, sessionId) + (cmd.includes('{sid}') ? '' : ' ' + sessionId);
+            sendCommand(fullCmd);
+        }
+
+        function askAI() {
+            const sessionId = getSessionId();
+            const askInput = document.getElementById('askInput');
+            const message = askInput.value.trim();
+            if (!sessionId) {
+                addOutput('⚠ Please enter a Session ID first!', 'error');
+                return;
+            }
+            if (!message) {
+                addOutput('⚠ Please type a message for the AI!', 'error');
+                return;
+            }
+            sendCommand('ask ' + sessionId + ' ' + message);
+            askInput.value = '';
+        }
+
+        // Allow Enter key in ask input
+        document.addEventListener('DOMContentLoaded', () => {
+            const askInput = document.getElementById('askInput');
+            if (askInput) {
+                askInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && askInput.value.trim()) {
+                        askAI();
+                    }
+                });
+            }
+        });
+
+        async function createSession() {
+            const botName = document.getElementById('botNameInput').value.trim() || 'DoryBot';
+            const host = document.getElementById('hostInput').value.trim() || 'localhost';
+            const port = parseInt(document.getElementById('portInput').value.trim()) || 25565;
+
+            addOutput(`Creating bot session: ${botName} → ${host}:${port}...`, 'info');
+
+            try {
+                const resp = await fetch('http://localhost/game/api/sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ serverHost: host, serverPort: port, botName: botName }),
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    addOutput('Bot session created!', 'success');
+                    addOutput('  Session ID: ' + data.sessionId, 'success');
+                    addOutput('  Bot name: ' + botName, 'info');
+                    document.getElementById('sessionId').value = data.sessionId;
+                } else {
+                    addOutput('Failed to create session: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (err) {
+                addOutput('Request failed: ' + err.message, 'error');
+            }
+        }
+
+        async function disconnectSession() {
+            const sessionId = getSessionId();
+            if (!sessionId) {
+                addOutput('Please enter a Session ID first!', 'error');
+                return;
+            }
+
+            addOutput('Disconnecting session ' + sessionId + '...', 'info');
+
+            try {
+                const resp = await fetch('http://localhost/game/api/sessions/' + sessionId, {
+                    method: 'DELETE',
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    addOutput('Session disconnected: ' + data.message, 'success');
+                    document.getElementById('sessionId').value = '';
+                } else {
+                    addOutput('Failed: ' + (data.error || 'Unknown error'), 'error');
+                }
+            } catch (err) {
+                addOutput('Request failed: ' + err.message, 'error');
+            }
+        }
+
+        function testSession() {
+            const sessionId = getSessionId();
+            if (!sessionId) {
+                addOutput('⚠ Please enter a Session ID first!', 'error');
+                return;
+            }
+            sendCommand('position ' + sessionId);
+        }
+
+        function loadSessions() {
+            sendCommand('sessions');
+        }
+
+        function sendCommand(cmd) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                addOutput('Not connected to server', 'error');
+                return;
+            }
+
+            addOutput('$ ' + cmd, 'command');
+
+            ws.send(JSON.stringify({
+                type: 'command',
+                command: cmd
+            }));
+        }
+
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                sendCommand(input.value.trim());
+                input.value = '';
+            }
+        });
+
+        // Auto-connect on load
+        connect();
+
+        // Add welcome message
+        setTimeout(() => {
+            addOutput('🤖 Dory Game Agent Test Console', 'info');
+            addOutput('', 'info');
+            addOutput('📝 Quick Start:', 'info');
+            addOutput('1. Click "Load Sessions" to see active bots', 'info');
+            addOutput('2. Or create a session: curl -X POST http://localhost/game/api/sessions -H "Content-Type: application/json" -d \'{"serverHost": "localhost", "serverPort": 25565, "botName": "TestBot"}\'', 'info');
+            addOutput('3. The Session ID will be auto-filled from the list', 'info');
+            addOutput('4. Use the quick command buttons or type commands manually', 'info');
+            addOutput('5. Type "help" for all available commands', 'info');
+            addOutput('', 'info');
+            
+            // Auto-load sessions
+            setTimeout(() => {
+                sendCommand('sessions');
+            }, 500);
+        }, 500);
+    </script>
+</body>
+</html>

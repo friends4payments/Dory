@@ -274,7 +274,7 @@ export async function updateSessionSummary(
     if (existing) {
       await summariesCol.updateOne({ _id: existing._id }, { $set: summary });
       console.log(`[Summary Manager] Updated session summary v${summary.version}`);
-      return existing._id;
+      return existing._id ?? null;
     } else {
       const res = await summariesCol.insertOne(summary as any);
       console.log(`[Summary Manager] Created session summary: ${res.insertedId}`);
@@ -428,7 +428,7 @@ export async function updateUserProfile(
         { $set: profile }
       );
       console.log(`[Summary Manager] Updated user profile v${profile.version}`);
-      return existingProfile._id;
+      return existingProfile._id ?? null;
     } else {
       const res = await summariesCol.insertOne(profile as any);
       console.log(`[Summary Manager] Created user profile: ${res.insertedId}`);
@@ -568,7 +568,7 @@ export async function updateDailySummary(
     if (existingDaily) {
       await summariesCol.updateOne({ _id: existingDaily._id }, { $set: daily });
       console.log(`[Summary Manager] Updated daily summary v${daily.version}`);
-      return existingDaily._id;
+      return existingDaily._id ?? null;
     } else {
       const res = await summariesCol.insertOne(daily as any);
       console.log(`[Summary Manager] Created daily summary: ${res.insertedId}`);

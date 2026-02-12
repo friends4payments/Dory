@@ -237,7 +237,7 @@ export function createGatekeeperTools(context: ToolContext) {
             const summary = await summarizeConversation(recentMsgs, config.GROQ_API_KEY, 'https://api.groq.com/openai/v1');
             conversationSummary = formatSummaryForPrompt(summary);
 
-            console.log(`[Tool:changeMode] Summary: ${conversationSummary.substring(0, 80)}...`);
+            console.log(`[Tool:changeMode] Summary: ${conversationSummary?.substring(0, 80)}...`);
           } catch (error) {
             console.error('[Tool:changeMode] Summary failed:', error);
             conversationSummary = 'User was talking to the gatekeeper before switching.';

@@ -86,7 +86,7 @@ export function UnifiedAgentProvider({ children }: UnifiedAgentProviderProps) {
     // Source 2: personaData from PersonaBuilder
     if (personaData && personaData.name) {
       setActivePersona({
-        id: state.activePersonaId,
+        id: state.activePersonaId || '',
         name: personaData.name,
         avatar: personaData.imageUrl || null,
       })
@@ -121,7 +121,7 @@ export function UnifiedAgentProvider({ children }: UnifiedAgentProviderProps) {
           const persona = data.persona || data
           
           setActivePersona({
-            id: state.activePersonaId,
+            id: state.activePersonaId || '',
             name: persona.identity?.name || 'Companion',
             tagline: persona.identity?.tagline,
             avatar: persona.visualIdentity?.avatarUrl || null,
@@ -130,7 +130,7 @@ export function UnifiedAgentProvider({ children }: UnifiedAgentProviderProps) {
         } else {
           // API fetch failed, use minimal fallback
           setActivePersona({
-            id: state.activePersonaId,
+            id: state.activePersonaId || '',
             name: 'Companion',
             avatar: null,
           })
@@ -140,7 +140,7 @@ export function UnifiedAgentProvider({ children }: UnifiedAgentProviderProps) {
         console.error('[UnifiedAgentContext] Error fetching persona details:', error)
         // On error, use minimal fallback
         setActivePersona({
-          id: state.activePersonaId,
+          id: state.activePersonaId || '',
           name: 'Companion',
           avatar: null,
         })

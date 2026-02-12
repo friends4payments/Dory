@@ -41,7 +41,7 @@ export async function sendConversationContext(
       return { success: false };
     }
 
-    const data = await resp.json();
+    const data = (await resp.json()) as { memoriesCreated?: number };
     console.log(
       `[ContextService] Sent ${conversationHistory.length} messages -> ${data.memoriesCreated || 0} memories created`
     );
@@ -70,7 +70,7 @@ export async function fetchSystemContext(
 
     if (!resp.ok) return null;
 
-    const data = await resp.json();
+    const data = (await resp.json()) as { success?: boolean; context?: string };
     if (data.success && data.context) {
       console.log(
         `[ContextService] Fetched system context (${data.context.length} chars)`

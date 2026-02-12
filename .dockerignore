@@ -1,0 +1,38 @@
+# Dependencies (reinstalled in container)
+node_modules
+.pnpm-store
+
+# Build outputs (rebuilt in container)
+**/dist
+**/.next
+**/.turbo
+
+# Environment files (secrets - mounted or injected at runtime)
+**/.env
+**/.env.local
+**/.env.production
+**/.env.*.local
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.cursor
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs & media (not needed in container)
+*.md
+img/
+
+# Docker (prevent recursive copy)
+Dockerfile
+docker-compose*.yml
+.dockerignore

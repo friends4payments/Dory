@@ -22,7 +22,7 @@ export async function fetchPendingEvents(): Promise<FetchedEvent[]> {
   try {
     const resp = await fetch(`${VOICE_AGENT_URL}/api/events`);
     if (!resp.ok) return [];
-    const data = await resp.json();
+    const data = (await resp.json()) as { events?: FetchedEvent[] };
     return data.events || [];
   } catch {
     return [];
