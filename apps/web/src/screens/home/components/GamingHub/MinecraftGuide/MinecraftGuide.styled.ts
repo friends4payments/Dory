@@ -164,74 +164,12 @@ export const VideoWrapper = styled.div`
   overflow: hidden;
   background: ${scColors.black};
   box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5);
-
-  &:hover img {
-    opacity: 1;
-  }
-  &:hover .play-button {
-    transform: scale(1.1);
-  }
 `
 
-export const VideoImage = styled.img`
+export const VideoIframe = styled.iframe`
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  opacity: 0.6;
-  transition: opacity 500ms ease;
-`
-
-export const VideoPlayOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-
-  .play-button {
-    pointer-events: auto;
-  }
-`
-
-export const VideoPlayButton = styled.div`
-  width: 3.5rem;
-  height: 3.5rem;
-  background: ${scColors.yellow.base};
-  border-radius: 50%;
-  border: 4px solid ${scColors.black};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 30px rgba(255, 204, 0, 0.3);
-  transition: transform 300ms ease;
-  cursor: pointer;
-
-  svg {
-    width: 1.75rem;
-    height: 1.75rem;
-    color: ${scColors.black};
-    margin-left: 0.25rem;
-  }
-`
-
-export const VideoBadge = styled.div`
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  padding: 0.25rem 0.625rem;
-  background: ${scColors.red.base};
-  border: 3px solid ${scColors.black};
-  border-radius: ${borderRadius.lg};
-  font-size: 0.8125rem;
-  font-weight: 800;
-  font-style: italic;
-  text-transform: uppercase;
-  color: ${scColors.white};
-  text-shadow:
-    1px 1px 0 ${scColors.black},
-    -1px -1px 0 ${scColors.black};
-  font-family: 'Lilita One', cursive;
+  border: none;
 `
 
 // ==================== SECTIONS ====================

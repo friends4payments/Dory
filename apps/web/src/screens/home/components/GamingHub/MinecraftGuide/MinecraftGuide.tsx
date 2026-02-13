@@ -40,18 +40,13 @@ export const MinecraftGuide: React.FC<MinecraftGuideProps> = ({ onClose }) => {
               <S.VideoSectionTitle>Master Class Tutorial</S.VideoSectionTitle>
             </S.VideoSectionHeader>
             <S.VideoWrapper>
-              <S.VideoImage
-                src="https://images.unsplash.com/photo-1627389955609-bf2420658700?auto=format&fit=crop&q=80&w=1200"
-                alt="Minecraft Tutorial"
+              <S.VideoIframe
+                src="https://www.youtube.com/embed/LkpuNiOmg6U?loop=1&playlist=LkpuNiOmg6U&rel=0"
+                title="Minecraft Multiplayer Tutorial"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                frameBorder="0"
               />
-              <S.VideoPlayOverlay>
-                <S.VideoPlayButton className="play-button">
-                  <svg fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </S.VideoPlayButton>
-              </S.VideoPlayOverlay>
-              <S.VideoBadge>PRO TIPS</S.VideoBadge>
             </S.VideoWrapper>
           </S.VideoSection>
 
