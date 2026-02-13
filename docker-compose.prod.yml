@@ -84,9 +84,9 @@ services:
     environment:
       - PORT=4003
       - MONGODB_URI=mongodb://mongodb:27017/dory?replicaSet=rs0
-      # Persona builder uses OpenRouter via OpenAI SDK — override the direct OpenAI key
-      - OPENAI_API_KEY=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
-      - OPENAI_BASE_URL=https://openrouter.ai/api/v1
+      # Clear the OpenRouter base URL so persona-builder uses direct OpenAI API
+      # (OPENAI_API_KEY comes from .env.production — the real OpenAI key)
+      - OPENAI_BASE_URL=
     depends_on:
       mongodb:
         condition: service_healthy
@@ -113,21 +113,15 @@ services:
     networks:
       - dory-net
 
-  # ── Caddy (reverse proxy with automatic HTTPS) ──────────────────
-  caddy:
-    image: caddy:2-alpine
-    container_name: dory-caddy
+  # ── Nginx (reverse proxy) ─────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: dory-nginx
     ports:
       - "80:80"
-      - "443:443"
-      - "443:443/udp"
     volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - ./tools:/srv/tools:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    environment:
-      - DOMAIN=${DEPLOY_URL:-localhost}
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./tools:/usr/share/nginx/html/tools:ro
     depends_on:
       - web
       - game-agent
@@ -144,5 +138,3 @@ networks:
 
 volumes:
   dory-mongo-data:
-  caddy-data:
-  caddy-config:
