@@ -244,7 +244,7 @@ export const HubContainer = styled.div`
 export const CompanionSidebar = styled.div`
   display: flex;
   flex-direction: column;
-  width: 380px;
+  width: 440px;
   flex-shrink: 0;
   min-height: 0;
   padding-left: 2.5rem;
@@ -367,6 +367,74 @@ export const SidebarSeparator = styled.div`
   width: 100%;
   height: 3px;
   background: rgba(0, 0, 0, 0.08);
+`
+
+// ==================== SIDEBAR SECTION HEADER (Active Event + info button) ====================
+
+export const SidebarSectionHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  margin-bottom: 0.5rem;
+`
+
+export const SidebarSectionTitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`
+
+export const SidebarSectionIcon = styled.div`
+  width: 1rem;
+  height: 1rem;
+  background: ${scColors.yellow.base};
+  border: 2px solid ${scColors.black};
+  transform: rotate(45deg);
+`
+
+export const SidebarSectionTitle = styled.span`
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  color: ${scColors.white};
+  text-shadow:
+    2px 2px 0 ${scColors.black},
+    -1px -1px 0 ${scColors.black},
+    1px -1px 0 ${scColors.black},
+    -1px 1px 0 ${scColors.black};
+  font-family: 'Lilita One', cursive;
+`
+
+export const SidebarInfoButton = styled.button`
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: ${scColors.pink.base};
+  border: 4px solid ${scColors.black};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 800;
+  font-style: italic;
+  color: ${scColors.white};
+  cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  transition: transform 100ms ease, box-shadow 100ms ease;
+  font-family: 'Lilita One', cursive;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95) translateY(2px);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+  }
 `
 
 // ==================== RIGHT: CHAT COLUMN ====================

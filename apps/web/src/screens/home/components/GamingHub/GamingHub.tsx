@@ -37,6 +37,8 @@ import { ChatComposer } from '../GatekeeperChat/ChatComposer'
 import { CompanionCard } from './CompanionCard'
 import { GameStatusCard } from './GameStatusCard'
 import { ChatHistoryList } from './ChatHistoryList'
+import { URLInputModal } from './URLInputModal'
+import { MinecraftGuide } from './MinecraftGuide'
 import * as S from './GamingHub.styled'
 
 // ==================== LOCAL CONNECTING LOADER STYLES ====================
@@ -115,6 +117,30 @@ const GamingHubInner: React.FC<GamingHubInnerProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [suggestionsCollapsed, setSuggestionsCollapsed] = useState(false)
   const [isConnecting, setIsConnecting] = useState(false)
+
+  // ngrok URL and modals (Minecraft guide + URL input)
+  const [ngrokURL, setNgrokURL] = useState<string | null>(null)
+  const [showMinecraftGuide, setShowMinecraftGuide] = useState(false)
+  const [showURLInputModal, setShowURLInputModal] = useState(false)
+
+  // Hydrate ngrokURL from localStorage on mount; if empty, show guide
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem('ngrokServerURL')
+    setNgrokURL(stored)
+    if (!stored?.trim()) {
+      setShowMinecraftGuide(true)
+    }
+  }, [])
+
+  const handleSaveURL = useCallback((url: string) => {
+    const sanitized = url.trim()
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('ngrokServerURL', sanitized)
+    }
+    setNgrokURL(sanitized)
+    setShowURLInputModal(false)
+  }, [])
 
   // LiveKit hooks
   const sessionContext = useSessionContext()
@@ -485,7 +511,17 @@ const GamingHubInner: React.FC<GamingHubInnerProps> = ({
                   {/* Sub-sections */}
                   <S.SidebarContent>
                     <S.SidebarSeparator />
-                    <GameStatusCard game={gameState} />
+                    <GameStatusCard
+                      game={gameState}
+                      ngrokURL={ngrokURL}
+                      onClick={() => setShowURLInputModal(true)}
+                      onInfoClick={() => setShowMinecraftGuide(true)}
+                      onConnect={liveKitConnected ? () => {
+                        if (ngrokURL) {
+                          handleSendMessage(`Please connect to minecraft on server ${ngrokURL}`)
+                        }
+                      } : undefined}
+                    />
                     <ChatHistoryList onNewChat={handleNewChat} />
                   </S.SidebarContent>
                 </S.SidebarScroll>
@@ -625,6 +661,22 @@ const GamingHubInner: React.FC<GamingHubInnerProps> = ({
           </S.ChatColumn>
         </S.HubContainer>
       </S.MainWorkspace>
+
+      {/* Modals */}
+      {showMinecraftGuide && (
+        <MinecraftGuide onClose={() => setShowMinecraftGuide(false)} />
+      )}
+      {showURLInputModal && (
+        <URLInputModal
+          initialValue={ngrokURL ?? ''}
+          onSave={handleSaveURL}
+          onClose={() => setShowURLInputModal(false)}
+          onOpenGuide={() => {
+            setShowURLInputModal(false)
+            setShowMinecraftGuide(true)
+          }}
+        />
+      )}
 
       {/* Audio components for LiveKit */}
       <StartAudio label="Click to enable audio" />
