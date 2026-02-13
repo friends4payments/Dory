@@ -84,9 +84,9 @@ services:
     environment:
       - PORT=4003
       - MONGODB_URI=mongodb://mongodb:27017/dory?replicaSet=rs0
-      # Persona builder uses OpenRouter via OpenAI SDK — override the direct OpenAI key
-      - OPENAI_API_KEY=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
-      - OPENAI_BASE_URL=https://openrouter.ai/api/v1
+      # Clear the OpenRouter base URL so persona-builder uses direct OpenAI API
+      # (OPENAI_API_KEY comes from .env.production — the real OpenAI key)
+      - OPENAI_BASE_URL=
     depends_on:
       mongodb:
         condition: service_healthy
@@ -101,10 +101,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_GATEKEEPER_WS_URL: wss://${DEPLOY_URL:-localhost}/gatekeeper/ws
-        NEXT_PUBLIC_PERSONA_WS_URL: wss://${DEPLOY_URL:-localhost}/persona/ws
-        NEXT_PUBLIC_VOICE_AGENT_WS_URL: wss://${DEPLOY_URL:-localhost}/voice/ws
-        NEXT_PUBLIC_VOICE_AGENT_API_URL: https://${DEPLOY_URL:-localhost}/voice
+        NEXT_PUBLIC_GATEKEEPER_WS_URL: ws://${DEPLOY_URL:-localhost}/gatekeeper/ws
+        NEXT_PUBLIC_PERSONA_WS_URL: ws://${DEPLOY_URL:-localhost}/persona/ws
+        NEXT_PUBLIC_VOICE_AGENT_WS_URL: ws://${DEPLOY_URL:-localhost}/voice/ws
+        NEXT_PUBLIC_VOICE_AGENT_API_URL: http://${DEPLOY_URL:-localhost}/voice
         NEXT_PUBLIC_LIVEKIT_URL: ${LIVEKIT_URL:-wss://dory-pi7wfp2y.livekit.cloud}
     container_name: dory-web
     working_dir: /app/apps/web
