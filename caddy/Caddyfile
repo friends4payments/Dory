@@ -1,0 +1,32 @@
+{$DOMAIN:localhost} {
+    # ── Voice Agent ──────────────────────────────────────────────────
+    handle_path /voice/* {
+        reverse_proxy voice-agent:4001
+    }
+
+    # ── Gatekeeper Agent ─────────────────────────────────────────────
+    handle_path /gatekeeper/* {
+        reverse_proxy gatekeeper-agent:4002
+    }
+
+    # ── Persona Builder Agent ────────────────────────────────────────
+    handle_path /persona/* {
+        reverse_proxy persona-builder-agent:4003
+    }
+
+    # ── Game Agent ───────────────────────────────────────────────────
+    handle_path /game/* {
+        reverse_proxy game-agent:3000
+    }
+
+    # ── Dev / Debug Tools (static HTML) ──────────────────────────────
+    handle_path /tools/* {
+        root * /srv/tools
+        file_server
+    }
+
+    # ── Web App (catch-all) ──────────────────────────────────────────
+    handle {
+        reverse_proxy web:3000
+    }
+}
