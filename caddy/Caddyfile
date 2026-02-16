@@ -1,4 +1,4 @@
-http://{$DOMAIN:localhost} {
+{$DOMAIN:localhost} {
     # ── Voice Agent ──────────────────────────────────────────────────
     handle_path /voice/* {
         reverse_proxy voice-agent:4001
